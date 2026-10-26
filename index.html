@@ -35,7 +35,7 @@ main{max-width:700px;margin:auto;padding:14px 14px 30px}
 <div class="days" id="days"></div>
 <section class="next" id="next"></section>
 <div id="schedule"></div>
-<footer></footer>
+
 </main>
 <script>
 const weeks=[
@@ -101,7 +101,7 @@ function render(){
  const next=items.map(x=>({...x,m:Number(x[1].slice(0,2))*60+Number(x[1].slice(3))})).find(x=>!isToday||x.m>=current);
  let nextMarkup;
  if(next){
-   nextMarkup='<small>'+(isToday?'Următorul curs':'Primul curs în această zi')+'</small><strong>'+next[3]+'</strong><div>'+next[1]+'–'+next[2]+' · '+next[4]+(next[5]?' · '+next[5]:'')+'</div>';
+   nextMarkup='<small>Următorul curs</small><strong>'+next[3]+'</strong><div>'+next[1]+'–'+next[2]+' · '+next[4]+(next[5]?' · '+next[5]:'')+'</div>';
  }else if(isToday){
    nextMarkup='<small>Astăzi</small><strong>Nu mai ai cursuri</strong>';
  }else{
