@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a84ff">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Orar Facultate</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Arial,sans-serif;color:#111;background:#f2f2f7}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#eaf4ff,#f7f7fa 38%);min-height:100vh}
+header{padding:calc(env(safe-area-inset-top) + 18px) 18px 12px;background:#0a84ff;color:#fff}
+h1{font-size:30px;margin:0 0 4px}.sub{opacity:.85}
+main{max-width:700px;margin:auto;padding:14px 14px 30px}
+.days{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px}
+.days button{border:0;background:#fff;padding:10px 4px;border-radius:12px;font-weight:700;color:#555}
+.days button.active{background:#111;color:#fff}
+.next{background:#fff;border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:0 4px 18px #0000000d}
+.next small{color:#777}.next strong{display:block;font-size:21px;margin:5px 0}
+.card{background:#fff;border-radius:18px;padding:15px;margin:10px 0;box-shadow:0 3px 14px #0000000a;display:flex;gap:14px}
+.time{font-weight:800;min-width:82px}.title{font-weight:750;font-size:17px}.meta{color:#777;font-size:14px;margin-top:6px}
+.pill{display:inline-block;background:#e8f2ff;color:#0878e8;border-radius:20px;padding:4px 8px;font-size:12px;font-weight:700;margin-top:7px}
+.empty{text-align:center;padding:50px 20px;color:#777} footer{text-align:center;color:#888;font-size:12px;padding:10px 0 30px}
+@media(prefers-color-scheme:dark){body{background:#111}.days button,.next,.card{background:#1c1c1e;color:#fff}.days button{color:#bbb}.days button.active{background:#fff;color:#111}}
+</style>
+</head>
+<body>
+<header><h1>Orar Facultate</h1><div class="sub" id="date"></div></header>
+<main><div class="days" id="days"></div><section class="next" id="next"></section><div id="schedule"></div><footer>Orar din documentul furnizat.</footer></main>
+<script>
+const data=[
+["Luni","10:00","12:00","Elemente de bază în programare","Seminar","Lab. psihodiagn."],
+["Luni","12:00","14:00","Metode de cercetare cantitative și statistică în psihologie și științe cognitive","Curs","Lab Info 1"],
+["Luni","14:00","16:00","Introducere în psihologie","Curs","Amf. Zlate"],
+["Luni","18:00","20:00","Psihologia educației (Modulul psihopedagogic)","Seminar","Sala 502 Leu"],
+["Marți","08:00","10:00","Dezvoltarea limbajului și cogniției, opțional","Curs","Amf. Zlate"],
+["Marți","10:00","12:00","Dezvoltarea limbajului și cogniției, opțional","Seminar","Amf. Zlate"],
+["Marți","14:00","16:00","Franceză","Seminar",""],
+["Marți","18:00","20:00","Introducere în științele cognitive","Seminar","Sala 4"],
+["Miercuri","08:00","10:00","Psihologia educației (Modulul psihopedagogic)","Curs","Amf. Damaschin"],
+["Miercuri","10:00","12:00","Psihologie evoluționistă","Seminar","Sala 4"],
+["Miercuri","10:00","12:00","Introducere în neuroștiințe","Seminar","Lab. Pufan"],
+["Miercuri","14:00","16:00","Introducere în neuroștiințe","Curs","Amf. Motru"],
+["Miercuri","18:00","20:00","Psihologie evoluționistă","Curs","Online"],
+["Joi","12:00","14:00","Engleză","Seminar",""],
+["Joi","12:00","14:00","Gândire critică în științele cognitive, opțional","Seminar","Centrul de management"],
+["Joi","18:00","20:00","Elemente de bază în programare","Curs","Amf. Stoian"],
+["Vineri","08:00","10:00","Introducere în științele cognitive","Curs","Amf. Cantemir (Rectorat)"],
+["Vineri","10:00","12:00","Metode de cercetare cantitative și statistică în psihologie și Științe cognitive I","Curs","Amf. Cantemir (Rectorat)"],
+["Vineri","12:00","14:00","Introducere în psihologie","Seminar","Centrul de management"],
+["Vineri","14:00","16:00","Gândire critică în științele cognitive, opțional","Curs","Amf. Cantemir"]
+];
+const days=["Luni","Marți","Miercuri","Joi","Vineri"];
+let jsDay=new Date().getDay(); let selected=jsDay>=1&&jsDay<=5?jsDay-1:0;
+function render(){
+ document.getElementById("date").textContent=new Intl.DateTimeFormat("ro-RO",{weekday:"long",day:"numeric",month:"long"}).format(new Date());
+ document.getElementById("days").innerHTML=days.map((d,i)=>`<button class="${i===selected?'active':''}" onclick="selected=${i};render()">${d.slice(0,3)}</button>`).join("");
+ const items=data.filter(x=>x[0]===days[selected]);
+ const now=new Date(), current=now.getHours()*60+now.getMinutes();
+ const next=items.map(x=>({...x,m:Number(x[1].slice(0,2))*60+Number(x[1].slice(3))})).find(x=>x.m>=current);
+ document.getElementById("next").innerHTML=next?`<small>Următorul curs</small><strong>${next[3]}</strong><div>${next[1]}–${next[2]} · ${next[4]}${next[5]?" · "+next[5]:""}</div>`:`<small>Astăzi</small><strong>Nu mai ai cursuri</strong>`;
+ document.getElementById("schedule").innerHTML=items.length?items.map(x=>`<article class="card"><div class="time">${x[1]}<br>${x[2]}</div><div><div class="title">${x[3]}</div><span class="pill">${x[4]}</span>${x[5]?`<div class="meta">📍 ${x[5]}</div>`:""}</div></article>`).join(""):`<div class="empty">🎉 Zi liberă</div>`;
+}
+render();
+if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+</script>
+</body></html>
