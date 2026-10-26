@@ -19,13 +19,11 @@ main{max-width:700px;margin:auto;padding:14px 14px 30px}
 .days{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px}
 .days button{border:0;background:#fff;padding:10px 4px;border-radius:12px;font-weight:700;color:#555}
 .days button.active{background:#111;color:#fff}
-.next{background:#fff;border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:0 4px 18px #0000000d}
-.next small{color:#777}.next strong{display:block;font-size:21px;margin:5px 0}
 .card{background:#fff;border-radius:18px;padding:15px;margin:10px 0;box-shadow:0 3px 14px #0000000a;display:flex;gap:14px}
 .time{font-weight:800;min-width:82px}.title{font-weight:750;font-size:17px}.meta{color:#777;font-size:14px;margin-top:6px}
 .pill{display:inline-block;background:#e8f2ff;color:#0878e8;border-radius:20px;padding:4px 8px;font-size:12px;font-weight:700;margin-top:7px}
 .empty{text-align:center;padding:50px 20px;color:#777} footer{text-align:center;color:#888;font-size:12px;padding:10px 0 30px}
-@media(prefers-color-scheme:dark){body{background:#111}.days button,.next,.card,.week-picker{background:#1c1c1e;color:#fff}.days button{color:#bbb}.days button.active{background:#fff;color:#111}.week-picker label{color:#aaa}.week-picker select{background:#2c2c2e;color:#fff}}
+@media(prefers-color-scheme:dark){body{background:#111}.days button,.card,.week-picker{background:#1c1c1e;color:#fff}.days button{color:#bbb}.days button.active{background:#fff;color:#111}.week-picker label{color:#aaa}.week-picker select{background:#2c2c2e;color:#fff}}
 </style>
 </head>
 <body>
@@ -33,7 +31,6 @@ main{max-width:700px;margin:auto;padding:14px 14px 30px}
 <main>
 <section class="week-picker"><label for="weekSelect">Alege săptămâna</label><select id="weekSelect" aria-label="Alege săptămâna"></select></section>
 <div class="days" id="days"></div>
-<section class="next" id="next"></section>
 <div id="schedule"></div>
 
 </main>
@@ -95,19 +92,6 @@ function render(){
  document.getElementById("days").innerHTML=days.map((d,i)=>'<button class="'+(i===selectedDay?'active':'')+'" data-day="'+i+'">'+d.slice(0,3)+'</button>').join("");
  document.querySelectorAll("#days button").forEach(button=>button.addEventListener("click",()=>{selectedDay=Number(button.dataset.day);render();}));
  const items=data.filter(x=>x[0]===days[selectedDay]&&(!x[6]||x[6]===((selectedWeek+1)%2?1:2)));
- const currentWeek=currentWeekIndex();
- const isToday=selectedWeek===currentWeek&&selectedDay===todayDay-1;
- const now=new Date(), current=now.getHours()*60+now.getMinutes();
- const next=items.map(x=>({...x,m:Number(x[1].slice(0,2))*60+Number(x[1].slice(3))})).find(x=>!isToday||x.m>=current);
- let nextMarkup;
- if(next){
-   nextMarkup='<small>Următorul curs</small><strong>'+next[3]+'</strong><div>'+next[1]+'–'+next[2]+' · '+next[4]+(next[5]?' · '+next[5]:'')+'</div>';
- }else if(isToday){
-   nextMarkup='<small>Astăzi</small><strong>Nu mai ai cursuri</strong>';
- }else{
-   nextMarkup='<small>'+days[selectedDay]+' · săptămâna '+(selectedWeek+1)+'</small><strong>Nu ai cursuri în această zi</strong>';
- }
- document.getElementById("next").innerHTML=nextMarkup;
  document.getElementById("schedule").innerHTML=items.length?items.map(x=>'<article class="card"><div class="time">'+x[1]+'<br>'+x[2]+'</div><div><div class="title">'+x[3]+'</div><span class="pill">'+x[4]+'</span>'+(x[6]?'<span class="pill">Săptămâna '+x[6]+'</span>':'')+(x[5]?'<div class="meta">📍 '+x[5]+'</div>':'')+'</div></article>').join(""):'<div class="empty">🎉 Zi liberă</div>';
 }
 render();
