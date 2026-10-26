@@ -89,8 +89,21 @@ function render(){
  document.getElementById("date").textContent=optionLabel(selectedWeek);
  document.getElementById("days").innerHTML=days.map((d,i)=>'<button class="'+(i===selectedDay?'active':'')+'" data-day="'+i+'">'+d.slice(0,3)+'</button>').join("");
  document.querySelectorAll("#days button").forEach(button=>button.addEventListener("click",()=>{selectedDay=Number(button.dataset.day);render();}));
- const items=data.filter(x=>x[0]===days[selectedDay]&&(!x[6]||x[6]===((selectedWeek+1)%2?1:2)));
- document.getElementById("schedule").innerHTML=items.length?items.map(x=>'<article class="card"><div class="time">'+x[1]+'<br>'+x[2]+'</div><div><div class="title">'+x[3]+'</div><span class="pill">'+x[4]+'</span>'+(x[6]?'<span class="pill">Săptămâna '+x[6]+'</span>':'')+(x[5]?'<div class="meta">📍 '+x[5]+'</div>':'')+'</div></article>').join(""):'<div class="empty">🎉 Zi liberă</div>';
+ const classes=data.filter(x=>x[0]===days[selectedDay]&&(!x[6]||x[6]===((selectedWeek+1)%2?1:2)));
+ const items=classes.slice();
+ const minutes=value=>Number(value.slice(0,2))*60+Number(value.slice(3));
+ const clock=value=>String(Math.floor(value/60)).padStart(2,"0")+":"+String(value%60).padStart(2,"0");
+ if(classes.length>1){
+  const first=Math.min(...classes.map(x=>minutes(x[1])));
+  const last=Math.max(...classes.map(x=>minutes(x[2])));
+  for(let start=first;start+120<=last;start+=120){
+   if(!classes.some(x=>minutes(x[1])<start+120&&minutes(x[2])>start)){
+    items.push([days[selectedDay],clock(start),clock(start+120),"Pauză","","",null,true]);
+   }
+  }
+ }
+ items.sort((a,b)=>minutes(a[1])-minutes(b[1]));
+ document.getElementById("schedule").innerHTML=items.length?items.map(x=>x[7]?'<article class="card"><div class="time">'+x[1]+'<br>'+x[2]+'</div><div><div class="title">Pauză</div></div></article>':'<article class="card"><div class="time">'+x[1]+'<br>'+x[2]+'</div><div><div class="title">'+x[3]+'</div><span class="pill">'+x[4]+'</span>'+(x[6]?'<span class="pill">Săptămâna '+x[6]+'</span>':'')+(x[5]?'<div class="meta">📍 '+x[5]+'</div>':'')+'</div></article>').join(""):'<div class="empty">🎉 Zi liberă</div>';
 }
 render();
 if("serviceWorker" in navigator){navigator.serviceWorker.addEventListener("controllerchange",()=>window.location.reload());navigator.serviceWorker.register("sw.js");}
