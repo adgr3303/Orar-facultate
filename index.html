@@ -97,7 +97,7 @@ function render(){
  document.getElementById("date").textContent=optionLabel(selectedWeek)+" · "+range[0]+"–"+range[1];
  document.getElementById("days").innerHTML=days.map((d,i)=>'<button class="'+(i===selectedDay?'active':'')+'" data-day="'+i+'">'+d.slice(0,3)+'</button>').join("");
  document.querySelectorAll("#days button").forEach(button=>button.addEventListener("click",()=>{selectedDay=Number(button.dataset.day);render();}));
- const items=data.filter(x=>x[0]===days[selectedDay]&&(!x[6]||x[6]===(selectedWeek+1)%2+1));
+ const items=data.filter(x=>x[0]===days[selectedDay]&&(!x[6]||x[6]===((selectedWeek+1)%2?1:2)));
  const currentWeek=currentWeekIndex();
  const isToday=selectedWeek===currentWeek&&selectedDay===todayDay-1;
  const now=new Date(), current=now.getHours()*60+now.getMinutes();
