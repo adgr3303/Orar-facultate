@@ -77,7 +77,6 @@ const data=[
 ["Vineri","14:00","16:00","Gândire critică în științele cognitive, opțional","Curs","Amf. Cantemir"]
 ];
 const days=["Luni","Marți","Miercuri","Joi","Vineri"];
-const dateOptions={weekday:"long",day:"numeric",month:"long"};
 let selectedWeek=currentWeekIndex();
 const today=new Date();
 const todayDay=today.getDay();
@@ -94,7 +93,7 @@ function render(){
  }
  weekSelect.value=String(selectedWeek);
  const range=weeks[selectedWeek];
- document.getElementById("date").textContent=optionLabel(selectedWeek)+" · "+range[0]+"–"+range[1];
+ document.getElementById("date").textContent=optionLabel(selectedWeek);
  document.getElementById("days").innerHTML=days.map((d,i)=>'<button class="'+(i===selectedDay?'active':'')+'" data-day="'+i+'">'+d.slice(0,3)+'</button>').join("");
  document.querySelectorAll("#days button").forEach(button=>button.addEventListener("click",()=>{selectedDay=Number(button.dataset.day);render();}));
  const items=data.filter(x=>x[0]===days[selectedDay]&&(!x[6]||x[6]===((selectedWeek+1)%2?1:2)));
@@ -114,6 +113,6 @@ function render(){
  document.getElementById("schedule").innerHTML=items.length?items.map(x=>'<article class="card"><div class="time">'+x[1]+'<br>'+x[2]+'</div><div><div class="title">'+x[3]+'</div><span class="pill">'+x[4]+'</span>'+(x[6]?'<span class="pill">Săptămâna '+x[6]+'</span>':'')+(x[5]?'<div class="meta">📍 '+x[5]+'</div>':'')+'</div></article>').join(""):'<div class="empty">🎉 Zi liberă</div>';
 }
 render();
-if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+if("serviceWorker" in navigator){navigator.serviceWorker.addEventListener("controllerchange",()=>window.location.reload());navigator.serviceWorker.register("sw.js");}
 </script>
 </body></html>
